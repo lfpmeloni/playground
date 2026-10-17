@@ -35,9 +35,11 @@ permissions:
 
 jobs:
   paint:
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: that label migrates to Ubuntu 26 on 2026-10-19
+    # and this job has to keep working unattended for a year.
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           # A PAT here makes the push unambiguously the user's. Falls back to
@@ -45,7 +47,7 @@ jobs:
           # with an account-linked email -- which paint.py always does.
           token: ${{ secrets.COMMITZILLA_TOKEN || secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
