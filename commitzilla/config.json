@@ -1,0 +1,25 @@
+{
+  "repo": "lfpmeloni/playground",
+  "project_dir": "commitzilla",
+  "origin_date": "2026-10-18",
+  "days": 364,
+  "tz_offset": "-03:00",
+  "commit_time": "12:00:00",
+  "author_name": "Felipe Meloni",
+  "author_email": "13316573+lfpmeloni@users.noreply.github.com",
+  "branch_prefix": "paint/",
+  "_level_commits": "commits per square, sitting a notch ABOVE each observed band threshold (L1>=1, L2>=6, L3>=11, L4>=16 as measured 2026-10-18). The margin absorbs normal drift; verify.py tops up anything that still lands pale. Bands scale with the busiest day of the trailing year, and our own L4 days are expected to be that maximum, which makes the arrangement self-stabilising.",
+  "level_commits": {
+    "1": 2,
+    "2": 7,
+    "3": 12,
+    "4": 18
+  },
+  "_overhead": "contributions a painted day gets for free: opening the PR, and the merge commit. Measured during calibration, not assumed.",
+  "overhead": 2,
+  "calibrated": false,
+  "ascii": {
+    "w_scale": 2,
+    "h_scale": 3
+  }
+}

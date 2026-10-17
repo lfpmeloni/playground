@@ -1,0 +1,68 @@
+name: commitzilla
+
+# Paints one square of the dragon each night. See commitzilla/AGENT_BRIEF.md.
+#
+# Fires at 23:40 America/Sao_Paulo (02:40 UTC). Actions routinely delays
+# scheduled runs, so paint.py is given --for-scheduled-day: a run that slips
+# past local midnight still paints the night it was meant for instead of
+# jumping a day and leaving a hole.
+
+on:
+  schedule:
+    - cron: "40 2 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Day to paint (YYYY-MM-DD). Blank = tonight."
+        required: false
+      extra:
+        description: "Extra commits on top of the schedule (repair)."
+        required: false
+        default: "0"
+      dry_run:
+        description: "Print what would happen and touch nothing."
+        type: boolean
+        default: false
+
+concurrency:
+  group: commitzilla
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  paint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # A PAT here makes the push unambiguously the user's. Falls back to
+          # the built-in token, which works as long as the commits are AUTHORED
+          # with an account-linked email -- which paint.py always does.
+          token: ${{ secrets.COMMITZILLA_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Paint tonight's square
+        env:
+          GH_TOKEN: ${{ secrets.COMMITZILLA_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          python3 commitzilla/scripts/paint.py \
+            ${{ inputs.date && format('--date {0}', inputs.date) || '--for-scheduled-day' }} \
+            ${{ inputs.extra != '0' && inputs.extra != '' && format('--extra {0}', inputs.extra) || '' }} \
+            ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Re-render progress
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ secrets.COMMITZILLA_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          python3 commitzilla/scripts/verify.py --days 21 || true
+          python3 commitzilla/scripts/render.py --target
+          python3 commitzilla/scripts/render.py --actual || true
