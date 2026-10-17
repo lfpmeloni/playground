@@ -36,7 +36,17 @@ def thickness(c):
 
 
 # Shading by depth, top (back) to bottom (belly): bright ridge, mid body, dark belly.
-SHADE = {1: [2], 2: [3, 2], 3: [4, 3, 2]}
+#
+# Nothing in the dragon uses level 1, on purpose. Felipe's own real work lights
+# roughly a third of all days, almost always at 1-5 contributions, which is
+# exactly level 1. Any part of the dragon drawn at level 1 would be
+# indistinguishable from that background noise. Keeping the art at levels 2-4
+# means the noise stays visibly dimmer than every part of the picture.
+# The BODY is a solid level-3 mass with a level-4 ridge, rather than shading
+# down to level 2 at the belly: against level-1 background noise a dim belly
+# blurs the silhouette, and a crisp outline matters more here than a tubular
+# gradient. Level 2 survives only on extremities, where ambiguity costs little.
+SHADE = {1: [2], 2: [3, 3], 3: [4, 3, 3]}
 
 HEAD_COL = 38
 # Facing right. The open jaw is what makes this read as a head rather than a
@@ -53,7 +63,7 @@ HEAD = [
 
 # The flaming pearl, forever one week out of reach.
 # Sits level with the open mouth, forever one week out of reach.
-PEARL = [".1.", "141", ".1."]
+PEARL = [".2.", "242", ".2."]
 
 CLAW_COLS = (9, 19, 27)
 
@@ -78,9 +88,9 @@ def build():
         for i, level in enumerate(SHADE[depth]):
             put(g, top + i, c, level)
         if c in CLAW_COLS:
-            put(g, top + depth, c, 1)
+            put(g, top + depth, c, 2)
 
-    put(g, SPINE[0], 0, 1)            # tail tip fades out
+    put(g, SPINE[0], 0, 2)            # tail tip fades out
     blit(g, HEAD, 0, HEAD_COL)        # skull fills rows 0..5
     blit(g, PEARL, 2, COLS - 3)   # row 3: dead ahead of the open jaw
     return g

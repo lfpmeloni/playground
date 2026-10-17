@@ -11,6 +11,17 @@ completely silent on the days that have to remain dark.
 
 The tail is painted first. The head lands in the final weeks.
 
+### What it will really look like
+
+![with background activity](out/with_noise.png)
+
+Felipe's own work lit 111 of the last 365 days, almost always at 1-5
+contributions. Those land wherever they land, including on squares the dragon
+needs dark, and contributions can never be removed. So the dragon deliberately
+uses **no level 1 at all** — the art lives at levels 2-4 and the background noise
+stays visibly dimmer than every part of the picture. Regenerate this preview at
+the historical rate with `python3 scripts/preview_noise.py [seed]`.
+
 ## The other dragon
 
 The same picture is being uncovered in [`DRAGON.md`](DRAGON.md), one sliver per

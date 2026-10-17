@@ -3,8 +3,8 @@
  "end": "2027-10-16",
  "rows": 7,
  "cols": 52,
- "projected_contributions": 1807,
- "projected_commits": 1529,
+ "projected_contributions": 2022,
+ "projected_commits": 1736,
  "ascii_cells": 2184,
  "reveal_step": 1,
  "days": {
@@ -44,9 +44,9 @@
    "day": 4,
    "col": 0,
    "row": 4,
-   "level": 1,
-   "commits": 2,
-   "made": 1
+   "level": 2,
+   "commits": 7,
+   "made": 5
   },
   "2026-10-23": {
    "day": 5,
@@ -212,9 +212,9 @@
    "day": 25,
    "col": 3,
    "row": 4,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2026-11-13": {
    "day": 26,
@@ -260,9 +260,9 @@
    "day": 31,
    "col": 4,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2026-11-19": {
    "day": 32,
@@ -316,9 +316,9 @@
    "day": 38,
    "col": 5,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2026-11-26": {
    "day": 39,
@@ -364,9 +364,9 @@
    "day": 44,
    "col": 6,
    "row": 2,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2026-12-02": {
    "day": 45,
@@ -428,9 +428,9 @@
    "day": 52,
    "col": 7,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2026-12-10": {
    "day": 53,
@@ -484,9 +484,9 @@
    "day": 59,
    "col": 8,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2026-12-17": {
    "day": 60,
@@ -540,17 +540,17 @@
    "day": 66,
    "col": 9,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2026-12-24": {
    "day": 67,
    "col": 9,
    "row": 4,
-   "level": 1,
-   "commits": 2,
-   "made": 1
+   "level": 2,
+   "commits": 7,
+   "made": 5
   },
   "2026-12-25": {
    "day": 68,
@@ -604,9 +604,9 @@
    "day": 74,
    "col": 10,
    "row": 4,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-01-01": {
    "day": 75,
@@ -660,9 +660,9 @@
    "day": 81,
    "col": 11,
    "row": 4,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-01-08": {
    "day": 82,
@@ -724,9 +724,9 @@
    "day": 89,
    "col": 12,
    "row": 5,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-01-16": {
    "day": 90,
@@ -780,9 +780,9 @@
    "day": 96,
    "col": 13,
    "row": 5,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-01-23": {
    "day": 97,
@@ -844,9 +844,9 @@
    "day": 104,
    "col": 14,
    "row": 6,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-01-31": {
    "day": 105,
@@ -900,9 +900,9 @@
    "day": 111,
    "col": 15,
    "row": 6,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-02-07": {
    "day": 112,
@@ -956,9 +956,9 @@
    "day": 118,
    "col": 16,
    "row": 6,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-02-14": {
    "day": 119,
@@ -1012,9 +1012,9 @@
    "day": 125,
    "col": 17,
    "row": 6,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-02-21": {
    "day": 126,
@@ -1060,9 +1060,9 @@
    "day": 131,
    "col": 18,
    "row": 5,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-02-27": {
    "day": 132,
@@ -1116,17 +1116,17 @@
    "day": 138,
    "col": 19,
    "row": 5,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-03-06": {
    "day": 139,
    "col": 19,
    "row": 6,
-   "level": 1,
-   "commits": 2,
-   "made": 1
+   "level": 2,
+   "commits": 7,
+   "made": 5
   },
   "2027-03-07": {
    "day": 140,
@@ -1164,9 +1164,9 @@
    "day": 144,
    "col": 20,
    "row": 4,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-03-12": {
    "day": 145,
@@ -1220,9 +1220,9 @@
    "day": 151,
    "col": 21,
    "row": 4,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-03-19": {
    "day": 152,
@@ -1268,9 +1268,9 @@
    "day": 157,
    "col": 22,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-03-25": {
    "day": 158,
@@ -1324,9 +1324,9 @@
    "day": 164,
    "col": 23,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-04-01": {
    "day": 165,
@@ -1380,9 +1380,9 @@
    "day": 171,
    "col": 24,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-04-08": {
    "day": 172,
@@ -1444,9 +1444,9 @@
    "day": 179,
    "col": 25,
    "row": 4,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-04-16": {
    "day": 180,
@@ -1500,9 +1500,9 @@
    "day": 186,
    "col": 26,
    "row": 4,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-04-23": {
    "day": 187,
@@ -1564,17 +1564,17 @@
    "day": 194,
    "col": 27,
    "row": 5,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-05-01": {
    "day": 195,
    "col": 27,
    "row": 6,
-   "level": 1,
-   "commits": 2,
-   "made": 1
+   "level": 2,
+   "commits": 7,
+   "made": 5
   },
   "2027-05-02": {
    "day": 196,
@@ -1620,9 +1620,9 @@
    "day": 201,
    "col": 28,
    "row": 5,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-05-08": {
    "day": 202,
@@ -1684,9 +1684,9 @@
    "day": 209,
    "col": 29,
    "row": 6,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-05-16": {
    "day": 210,
@@ -1740,9 +1740,9 @@
    "day": 216,
    "col": 30,
    "row": 6,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-05-23": {
    "day": 217,
@@ -1796,9 +1796,9 @@
    "day": 223,
    "col": 31,
    "row": 6,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-05-30": {
    "day": 224,
@@ -1844,9 +1844,9 @@
    "day": 229,
    "col": 32,
    "row": 5,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-06-05": {
    "day": 230,
@@ -1900,9 +1900,9 @@
    "day": 236,
    "col": 33,
    "row": 5,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-06-12": {
    "day": 237,
@@ -1940,9 +1940,9 @@
    "day": 241,
    "col": 34,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-06-17": {
    "day": 242,
@@ -1996,9 +1996,9 @@
    "day": 248,
    "col": 35,
    "row": 3,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-06-24": {
    "day": 249,
@@ -2044,9 +2044,9 @@
    "day": 254,
    "col": 36,
    "row": 2,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-06-30": {
    "day": 255,
@@ -2100,9 +2100,9 @@
    "day": 261,
    "col": 37,
    "row": 2,
-   "level": 2,
-   "commits": 7,
-   "made": 5
+   "level": 3,
+   "commits": 12,
+   "made": 10
   },
   "2027-07-07": {
    "day": 262,
@@ -2780,9 +2780,9 @@
    "day": 346,
    "col": 49,
    "row": 3,
-   "level": 1,
-   "commits": 2,
-   "made": 1
+   "level": 2,
+   "commits": 7,
+   "made": 5
   },
   "2027-09-30": {
    "day": 347,
@@ -2828,9 +2828,9 @@
    "day": 352,
    "col": 50,
    "row": 2,
-   "level": 1,
-   "commits": 2,
-   "made": 1
+   "level": 2,
+   "commits": 7,
+   "made": 5
   },
   "2027-10-06": {
    "day": 353,
@@ -2844,9 +2844,9 @@
    "day": 354,
    "col": 50,
    "row": 4,
-   "level": 1,
-   "commits": 2,
-   "made": 1
+   "level": 2,
+   "commits": 7,
+   "made": 5
   },
   "2027-10-08": {
    "day": 355,
@@ -2892,9 +2892,9 @@
    "day": 360,
    "col": 51,
    "row": 3,
-   "level": 1,
-   "commits": 2,
-   "made": 1
+   "level": 2,
+   "commits": 7,
+   "made": 5
   },
   "2027-10-14": {
    "day": 361,
