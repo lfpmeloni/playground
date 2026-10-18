@@ -1,24 +1,30 @@
 # playground
 
-This repository serves as a personal playground for my small projects and experiments in programming, automation, and AI. Here, I will document my journey, share code snippets, and showcase various testing scenarios and prototypes that I’m currently working on.
+Small projects that exist because I wanted to find out what would happen. Some
+of them work.
 
-## Small Projects & Experiments
+## What's in here
 
-Welcome to my personal repository for small projects and experiments! This repository contains various projects I am working on to enhance my skills in programming, automation, and AI.
+- **[commitzilla](commitzilla/)** — paints a Japanese dragon onto my contribution
+  graph, one day at a time, for a year. A cron job does the painting and a nightly
+  Claude routine checks the colours came out right. Peak effort in service of
+  absolutely no one.
 
-## Overview
+- **[crypto_options_data](crypto_options_data/)** — opens a pile of Binance
+  websockets, watches every BTC and ETH option at once, and drops a snapshot into
+  SQLite every minute. Mostly an excuse to learn `asyncio` the hard way.
 
-In this repository, you'll find:
+- **[google_fit](google_fit/)** — asks Google how much I walked this week and
+  draws it in matplotlib. The chart is usually more motivating than the number.
 
-- **Project A**: A brief description of what Project A does and its purpose.
-- **Project B**: A brief description of what Project B does and its purpose.
-- **Project C**: A brief description of what Project C does and its purpose.
+- **[langchain](langchain/)** — one afternoon of poking a ReAct agent with a
+  calculator and a search tool to see where the loop falls apart. It falls apart.
 
-Feel free to explore the code, run the projects, and provide feedback!
+## Running any of it
 
-## Getting Started
-
-To get a local copy of this repository, clone it using the following command:
+Each folder is independent — no shared install, no root command. `cd` into one
+and read its own README (where it has one).
 
 ```bash
-git clone https://github.com/<your-username>/small-projects.git
+git clone https://github.com/lfpmeloni/playground.git
+```
