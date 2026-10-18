@@ -109,7 +109,17 @@ def plan_for(day: str, extra: int):
     return entry, entry.get("made", max(1, entry["commits"] - CFG.get("overhead", 0)))
 
 
-def paint(day: str, extra: int, dry: bool, prog: dict, use_pr: bool = True):
+def paint(day: str, extra: int, dry: bool, prog: dict, use_pr: bool = True, force: bool = False):
+    # Idempotence matters more here than it looks: a manual run and the nightly
+    # cron landing on the same date would paint it twice, roughly doubling the
+    # day's contributions and tipping the square into the wrong band -- which
+    # cannot be undone. Repairs pass --extra and are always allowed through.
+    done = prog["days"].get(day)
+    if done and done.get("status") == "painted" and not extra and not force:
+        print(f"{day}: already painted ({done['made']} commits) -- nothing to do. "
+              f"Use --extra N to top it up, or --force to repaint.")
+        return prog
+
     entry, n = plan_for(day, extra)
     if entry is None:
         print(f"{day}: outside the schedule -- nothing to do")
@@ -151,8 +161,11 @@ def paint(day: str, extra: int, dry: bool, prog: dict, use_pr: bool = True):
     if dry:
         return prog
 
+    prior = prog["days"].get(day, {})
     prog["days"][day] = {
-        "level": lvl, "target_commits": entry["commits"], "made": n,
+        "level": lvl, "target_commits": entry["commits"],
+        "made": prior.get("made", 0) + n,
+        "repairs": prior.get("repairs", 0) + (1 if extra else 0),
         "observed": None, "status": "painted",
     }
     save_progress(prog)
@@ -212,6 +225,7 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--simulate-year", action="store_true")
     ap.add_argument("--no-pr", action="store_true", help="push straight to main (repair escape hatch)")
+    ap.add_argument("--force", action="store_true", help="repaint a day already recorded as painted")
     ap.add_argument("--for-scheduled-day", action="store_true",
                     help="used by the nightly cron: a run delayed past midnight still paints last night")
     a = ap.parse_args()
@@ -226,7 +240,7 @@ def main():
         raise SystemExit(f"refusing to paint the future: {day}")
 
     prog = load_progress()
-    paint(day, a.extra, a.dry_run, prog, use_pr=not a.no_pr)
+    paint(day, a.extra, a.dry_run, prog, use_pr=not a.no_pr, force=a.force)
 
 
 if __name__ == "__main__":
