@@ -58,6 +58,12 @@ commit, so the two finish together.
   `python3 commitzilla/scripts/blackout.py` before anything that writes; it exits 1
   on that day. On a blackout day your entire job is to do nothing.
 - **Never commit secrets.** There are live credentials elsewhere in this workspace.
+- **`overhead` in `config.json` is coupled to which token the workflow uses.** Measured
+  on day 0: with the built-in `GITHUB_TOKEN` the PR and the merge commit are both
+  attributed to `github-actions[bot]`, so neither counts toward Felipe's graph and
+  `overhead` is **0**. If a `COMMITZILLA_TOKEN` secret (a PAT) is ever added, they
+  start counting as his and `overhead` must be raised to **2** in the same change.
+  Getting this wrong overshoots every square by two, and an overshoot is permanent.
 - If the graph read-back fails, **stop and report**. Do not improvise commits; a
   wrong guess is permanent.
 

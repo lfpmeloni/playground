@@ -15,11 +15,16 @@
     "3": 12,
     "4": 18
   },
-  "_overhead": "contributions a painted day gets for free: opening the PR, and the merge commit. Measured during calibration, not assumed.",
-  "overhead": 2,
-  "calibrated": false,
+  "_overhead": "MEASURED on day 0, not assumed. With the built-in GITHUB_TOKEN both the PR and the merge commit are attributed to github-actions[bot], not to Felipe, so NEITHER counts toward his graph: overhead is 0 and every contribution must come from a hand-made commit. If COMMITZILLA_TOKEN (a PAT) is ever added, the PR and merge commit start counting as his and this MUST be raised to 2 -- otherwise every square overshoots by two, and an overshoot cannot be undone.",
+  "overhead": 0,
+  "calibrated": true,
   "ascii": {
-    "w_scale": 2,
+    "w_scale": 3,
     "h_scale": 3
+  },
+  "_calibration": {
+    "measured_on": "2026-10-18",
+    "finding": "3 hand-made commits counted; PR opened by bot counted 0; merge commit by bot counted 0",
+    "token": "GITHUB_TOKEN (built-in)"
   }
 }

@@ -85,6 +85,20 @@ python3 scripts/paint.py --simulate-year      # replay all 364 days
 python3 scripts/achievements.py --status
 ```
 
+## A note on tokens
+
+With the built-in `GITHUB_TOKEN`, the nightly PR is opened and merged by
+`github-actions[bot]`, not by Felipe. Measured on day 0: the hand-made commits
+count toward the graph, the PR and the merge commit do not. **The art works; the
+PR-based achievements do not.**
+
+To earn Pull Shark and YOLO, add a fine-grained PAT as the repo secret
+`COMMITZILLA_TOKEN` (scoped to this repo: Contents, Pull requests and Issues, all
+read/write). The workflow already prefers it. **If you add it, set `overhead` to
+`2` in `config.json` in the same change** — the PR and merge commit then start
+counting, and without that correction every square overshoots by two, which
+cannot be undone.
+
 ## Achievements
 
 Tracked in [`state/achievements.md`](state/achievements.md). Pull Shark, YOLO and

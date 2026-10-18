@@ -62,6 +62,14 @@ def main():
     }
     path = os.path.join(ROOT, "plan", "schedule.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    # Every commit must have a sliver of ASCII left to reveal, or it would have
+    # nothing to commit and the night would fail at 3am in CI. Fail loudly here
+    # instead, at build time, where someone is watching.
+    if total_cells <= total_commits:
+        raise SystemExit(
+            f"ascii canvas is too small: {total_cells} cells for {total_commits} commits. "
+            f"Raise ascii.w_scale / ascii.h_scale in config.json."
+        )
     json.dump(out, open(path, "w"), indent=1)
 
     painted = sum(1 for v in days.values() if v["commits"])
