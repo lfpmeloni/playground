@@ -51,6 +51,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Blackout guard
+        # 2027-08-10 is the dragon's eye, the only black square of the year.
+        # One contribution of any kind lights it, permanently.
+        run: python3 commitzilla/scripts/blackout.py
+
       - name: Paint tonight's square
         env:
           GH_TOKEN: ${{ secrets.COMMITZILLA_TOKEN || secrets.GITHUB_TOKEN }}

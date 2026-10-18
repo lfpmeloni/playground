@@ -6,21 +6,34 @@ A Japanese dragon, painted one day at a time onto a contribution graph.
 
 Every day from **2026-10-18** to **2027-10-16** is one pixel. The shade of each
 pixel is how many contributions land on that date, so drawing the dragon means
-making exactly the right amount of noise on exactly the right days — and staying
-completely silent on the days that have to remain dark.
+making exactly the right amount of noise on exactly the right day.
+
+**Every single day gets painted.** The background is the palest green rather than
+empty, and the dragon is picked out in brighter green on top of it.
 
 The tail is painted first. The head lands in the final weeks.
+
+## The one black day
+
+There is exactly one level-0 square in the whole 364 — **2027-08-10** — and it is
+the dragon's eye. One contribution of any kind on that date lights it and it can
+never be unlit, so everything that writes checks `scripts/blackout.py` first and
+does nothing at all that day.
+
+If you are reading this on 2027-08-10: don't push anything. Anywhere.
 
 ### What it will really look like
 
 ![with background activity](out/with_noise.png)
 
-Felipe's own work lit 111 of the last 365 days, almost always at 1-5
-contributions. Those land wherever they land, including on squares the dragon
-needs dark, and contributions can never be removed. So the dragon deliberately
-uses **no level 1 at all** — the art lives at levels 2-4 and the background noise
-stays visibly dimmer than every part of the picture. Regenerate this preview at
-the historical rate with `python3 scripts/preview_noise.py [seed]`.
+Felipe's own work lit 111 of the last 365 days. Because the background is level 1
+rather than empty, that activity can only nudge a background square up to level 2
+instead of punching a black hole through the picture — the dragon still reads
+clearly underneath it. Regenerate this preview at the historical rate with
+`python3 scripts/preview_noise.py [seed]`.
+
+The eye is the exception: it is the one square real activity would genuinely
+destroy, which is what `blackout.py` is for.
 
 ## The other dragon
 
@@ -36,8 +49,8 @@ advances the reveal. Both finish on the same day.
 | **Painter** | `.github/workflows/commitzilla.yml` — nightly cron. Makes the commits, opens one PR, merges it, deletes the branch. Dumb and reliable. |
 | **Supervisor** | a nightly Claude routine following [`AGENT_BRIEF.md`](AGENT_BRIEF.md). Reads the real graph back, repairs pale squares, retunes the shading, keeps the journal. |
 
-One PR per painted night, merged with `--merge` and `--delete-branch`, so the
-repo never holds more than a single branch.
+One PR per night — 363 of them over the year — each merged with `--merge` and
+`--delete-branch`, so the repo never holds more than a single branch.
 
 ## Why it needs a supervisor at all
 
@@ -65,6 +78,7 @@ scripts/             build_*, paint, verify, render, ascii_reveal, achievements
 
 ```bash
 python3 scripts/render.py --target            # the whole dragon, today
+python3 scripts/blackout.py                   # is today the eye? (exit 1 = do nothing)
 python3 scripts/verify.py --days 30           # target vs. what GitHub shows
 python3 scripts/paint.py --date 2027-03-14 --dry-run
 python3 scripts/paint.py --simulate-year      # replay all 364 days

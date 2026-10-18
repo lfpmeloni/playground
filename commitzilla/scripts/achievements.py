@@ -98,15 +98,15 @@ def status(login):
         "",
         "| Achievement | How | Status |",
         "|---|---|---|",
-        f"| **Pull Shark** | one merged PR per painted night | **{n}** merged PRs"
+        f"| **Pull Shark** | one merged PR every night | **{n}** merged PRs"
         + (f" — {tier} tier" if tier else " — not yet")
         + (f", next: {nxt[1]} at {nxt[0]}" if nxt else ", all tiers earned") + " |",
         "| **YOLO** | merging a PR with no review; the first night does it | earned on first merge |",
         "| **Quickdraw** | open an issue, close it inside 5 minutes | `--quickdraw`, one-off |",
         "",
         f"Next Pull Shark tier: **{eta_for(n, nxt[0]) if nxt else 'all tiers earned'}**.",
-        f"Painted nights left this year: {len(painted_nights_ahead())}. Rest days get no PR, "
-        "because a PR is itself a contribution and would light a square meant to stay dark.",
+        f"Painted nights left this year: {len(painted_nights_ahead())}. Every day is painted "
+        "except 2027-08-10, the dragon's eye, which gets no commit, no PR and no issue.",
         "",
         "## Recorded, not automated — and why",
         "",

@@ -67,6 +67,12 @@ PEARL = [".2.", "242", ".2."]
 
 CLAW_COLS = (9, 19, 27)
 
+# The background is level 1, not empty: every day of the year gets at least one
+# commit, so the graph is a field of pale green rather than a field of black.
+# Exactly ONE square in the whole 364 days is left at level 0 -- the dragon's
+# eye. It is the only black day of the year, which is the joke.
+EYE = (2, 42)   # row, col -> 2027-08-10
+
 
 def put(g, r, c, v):
     if 0 <= r < ROWS and 0 <= c < COLS:
@@ -93,6 +99,16 @@ def build():
     put(g, SPINE[0], 0, 2)            # tail tip fades out
     blit(g, HEAD, 0, HEAD_COL)        # skull fills rows 0..5
     blit(g, PEARL, 2, COLS - 3)   # row 3: dead ahead of the open jaw
+
+    # Flood the background up to level 1, sparing only the eye. The open jaw and
+    # the gap under the chin were level 0 too; at level 1 against the level-4
+    # skull they still read as gaps, just pale instead of black.
+    if g[EYE[0]][EYE[1]] != 0:
+        raise SystemExit(f"eye at {EYE} is not level 0 -- the head sprite must have moved")
+    for r in range(ROWS):
+        for c in range(COLS):
+            if g[r][c] == 0 and (r, c) != EYE:
+                g[r][c] = 1
     return g
 
 

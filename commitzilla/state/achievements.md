@@ -1,17 +1,17 @@
 # Achievements
 
-_Refreshed 2026-10-18 08:00 UTC by `scripts/achievements.py`._
+_Refreshed 2026-10-18 08:24 UTC by `scripts/achievements.py`._
 
 ## Being pursued automatically
 
 | Achievement | How | Status |
 |---|---|---|
-| **Pull Shark** | one merged PR per painted night | **24** merged PRs — silver tier, next: gold at 128 |
+| **Pull Shark** | one merged PR every night | **24** merged PRs — silver tier, next: gold at 128 |
 | **YOLO** | merging a PR with no review; the first night does it | earned on first merge |
 | **Quickdraw** | open an issue, close it inside 5 minutes | `--quickdraw`, one-off |
 
-Next Pull Shark tier: **~2027-07-13 (104 more painted nights)**.
-Painted nights left this year: 143. Rest days get no PR, because a PR is itself a contribution and would light a square meant to stay dark.
+Next Pull Shark tier: **~2027-01-30 (104 more painted nights)**.
+Painted nights left this year: 362. Every day is painted except 2027-08-10, the dragon's eye, which gets no commit, no PR and no issue.
 
 ## Recorded, not automated — and why
 
