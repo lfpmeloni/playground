@@ -12,6 +12,13 @@ paint.py aims at the BOTTOM of each band and leaves headroom to top up.
   verify.py              report drift
   verify.py --repair     also backfill pale squares with backdated commits
   verify.py --days 60    only look at the last N days
+  verify.py --repair-spec
+                         print ONLY the repairs as DATE:N,DATE:N (report goes to
+                         stderr) -- the cloud supervisor hands this to dispatch.py
+                         so the commits are made by Actions, not by the session
+
+The read-back lives in graph.py: the public calendar page first (no token, works
+from cloud sessions and Actions), GraphQL as a fallback.
 """
 
 import argparse
@@ -27,70 +34,48 @@ ROOT = os.path.dirname(HERE)
 CFG = json.load(open(os.path.join(ROOT, "config.json")))
 SCHED = json.load(open(os.path.join(ROOT, "plan", "schedule.json")))
 
-QUERY = """
-query($from: DateTime!, $to: DateTime!) {
-  viewer {
-    contributionsCollection(from: $from, to: $to) {
-      contributionCalendar {
-        weeks { contributionDays { date contributionCount color } }
-      }
-    }
-  }
-}
-"""
+sys.path.insert(0, HERE)
+import graph  # noqa: E402
 
 
-def fetch(frm: str, to: str):
-    out = subprocess.run(
-        ["gh", "api", "graphql", "-f", f"query={QUERY}",
-         "-F", f"from={frm}T00:00:00Z", "-F", f"to={to}T23:59:59Z"],
-        capture_output=True, text=True,
-    )
-    if out.returncode:
-        raise SystemExit(f"GraphQL read-back failed -- stopping rather than guessing.\n{out.stderr}")
-    weeks = json.loads(out.stdout)["data"]["viewer"]["contributionsCollection"] \
-        ["contributionCalendar"]["weeks"]
-    return {d["date"]: d for w in weeks for d in w["contributionDays"]}
+
+def say(*a):
+    print(*a, file=sys.stderr if SPEC_MODE else sys.stdout)
 
 
-def infer_bands(days):
-    """Learn the live count->level thresholds from the colours GitHub returned.
-
-    Far better than hardcoding: the bands rescale with the busiest day, and the
-    API hands us the answer for free.
-    """
-    by_color = {}
-    for d in days.values():
-        by_color.setdefault(d["color"], []).append(d["contributionCount"])
-    order = sorted(by_color, key=lambda c: min(by_color[c]))
-    bands = {}
-    for level, color in enumerate(order):
-        bands[level] = min(by_color[color])
-    return bands, {c: i for i, c in enumerate(order)}
+SPEC_MODE = False
 
 
 def main():
+    global SPEC_MODE
     ap = argparse.ArgumentParser()
     ap.add_argument("--repair", action="store_true")
+    ap.add_argument("--repair-spec", action="store_true")
     ap.add_argument("--days", type=int, default=400)
     ap.add_argument("--max-repairs", type=int, default=3,
                     help="cap repairs per run so a bad read cannot cause a commit storm")
     a = ap.parse_args()
+    SPEC_MODE = a.repair_spec
 
-    origin = date.fromisoformat(SCHED["origin"])
-    today = date.today()
-    # ALWAYS query the full trailing year, never a narrow window. GitHub
+    # ALWAYS read the full trailing year, never a narrow window. GitHub
     # recomputes the shade bands against whatever range it is given, so a
-    # 30-day query returns colours that do not match the profile page and
+    # 30-day window returns shades that do not match the profile page and
     # would send repairs chasing the wrong thresholds. --days narrows what we
-    # report and repair, not what we ask for.
-    days = fetch((today - timedelta(days=364)).isoformat(), today.isoformat())
-    horizon = today - timedelta(days=a.days)
+    # report and repair, not what we read.
+    try:
+        days, source = graph.fetch()
+    except graph.ReadBackError as e:
+        raise SystemExit(f"read-back failed -- stopping rather than guessing.\n{e}")
     if not days:
         raise SystemExit("no calendar data returned")
+    # "today" is the newest day GitHub shows, not this machine's clock: a cloud
+    # sandbox runs on UTC while the graph runs on the painter's local day.
+    today = date.fromisoformat(max(days))
+    horizon = today - timedelta(days=a.days)
 
-    bands, color_level = infer_bands(days)
-    print(f"live bands (count at which each level starts): {bands}")
+    bands = graph.bands(days)
+    say(f"read-back via {source}; graph ends {today}")
+    say(f"live bands (count at which each level starts): {bands}")
 
     rows, cols = SCHED["rows"], SCHED["cols"]
     actual = [[0] * cols for _ in range(rows)]
@@ -99,14 +84,13 @@ def main():
     for day, entry in sorted(SCHED["days"].items()):
         if day not in days or date.fromisoformat(day) > today:
             continue
+        obs = days[day]
+        actual[entry["row"]][entry["col"]] = obs["level"]
         if date.fromisoformat(day) < horizon:
             continue
-        obs = days[day]
-        got = color_level.get(obs["color"], 0)
-        actual[entry["row"]][entry["col"]] = got
         want = entry["level"]
-        if got != want:
-            drift.append((day, entry, want, got, obs["contributionCount"]))
+        if obs["level"] != want:
+            drift.append((day, entry, want, obs["level"], obs["count"]))
 
     os.makedirs(os.path.join(ROOT, "state"), exist_ok=True)
     with open(os.path.join(ROOT, "state", "actual.grid"), "w") as fh:
@@ -114,22 +98,31 @@ def main():
         for row in actual:
             fh.write("".join(str(v) for v in row) + "\n")
 
-    elapsed = sum(1 for d, e in SCHED["days"].items() if date.fromisoformat(d) <= today)
-    print(f"checked {elapsed} elapsed days of {rows * cols}; {len(drift)} off-target")
+    elapsed = sum(1 for d in SCHED["days"] if date.fromisoformat(d) <= today)
+    say(f"checked {elapsed} elapsed days of {rows * cols}; {len(drift)} off-target in the last {a.days}")
 
     pale = [d for d in drift if d[3] < d[2]]
     dark = [d for d in drift if d[3] > d[2]]
     for day, entry, want, got, count in drift:
         kind = "PALE" if got < want else "dark"
-        print(f"  {kind} {day}  want L{want} got L{got} ({count} contributions)")
+        say(f"  {kind} {day}  want L{want} got L{got} ({count} contributions)")
     if dark:
-        print(f"{len(dark)} squares came out too dark -- not fixable, contributions cannot be removed")
+        say(f"{len(dark)} squares came out too dark -- not fixable, contributions cannot be removed")
 
-    if not a.repair or not pale:
-        return 0
-
+    # Tonight's square is only pale because the painter has not run yet.
+    pale = [d for d in pale if d[0] != today.isoformat()]
+    plan = []
     for day, entry, want, got, count in pale[-a.max_repairs:]:
         need = max(1, bands.get(want, CFG["level_commits"][str(want)]) - count)
+        plan.append((day, need, want))
+
+    if a.repair_spec:
+        print(",".join(f"{d}:{n}" for d, n, _ in plan))
+        return 0
+    if not a.repair or not plan:
+        return 0
+
+    for day, need, want in plan:
         print(f"repairing {day}: +{need} backdated commits to reach L{want}")
         r = subprocess.run([sys.executable, os.path.join(HERE, "paint.py"),
                             "--date", day, "--extra", str(need)])

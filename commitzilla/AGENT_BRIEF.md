@@ -28,18 +28,43 @@ commit, so the two finish together.
 
 ## Your checklist
 
-1. `python3 commitzilla/scripts/verify.py --days 14` — compare the real graph to the target.
-2. Run `python3 commitzilla/scripts/blackout.py`. If it exits 1, stop here and do
-   nothing else at all today.
-3. If any square came out **pale**, repair it: `verify.py --repair` makes backdated
-   commits on that date through the normal one-PR-one-merge path. Squares that came
-   out **too dark** cannot be fixed; contributions cannot be removed. Log and move on.
-4. If the bands have shifted, update `level_commits` in `config.json` to sit a notch
-   above the thresholds `verify.py` reports, and say so in the journal.
-5. `python3 commitzilla/scripts/render.py --target && python3 commitzilla/scripts/render.py --actual`
-6. `python3 commitzilla/scripts/achievements.py --status`
-7. Append one line to `state/journal.md`: date, what the painter did, what you repaired.
-8. Commit the above through the same PR-and-merge path. One branch at a time.
+You run in a Claude Code **cloud session**. Two facts about that sandbox shape
+everything below:
+
+- **GitHub GraphQL is blocked**, and `gh pr create` / `gh pr merge` use GraphQL,
+  so you cannot open or merge PRs yourself. `gh auth status` reporting an
+  invalid `GH_TOKEN` is normal there; REST calls (`gh api repos/...`) still work.
+- **You never commit, push, open a PR or open an issue.** Anything you did
+  through the session's GitHub access would be attributed to Felipe and land on
+  his graph (the `overhead` trap below). All writes go through the workflow via
+  `dispatch.py`, where they are made by `github-actions[bot]` and count 0.
+
+1. `python3 commitzilla/scripts/blackout.py`. If it exits 1, stop. Do nothing
+   else at all today: no dispatch, no notification about the repo.
+2. `python3 commitzilla/scripts/verify.py --days 14`. It reads the public
+   calendar page, so it needs no token. If it fails, **stop and report.**
+3. `python3 commitzilla/scripts/verify.py --days 14 --repair-spec 2>/dev/null`
+   prints the pale squares to top up, as `DATE:N,DATE:N`, or nothing at all.
+   Tonight's square is excluded, since the painter may simply not have run yet.
+   **Too dark** squares cannot be fixed (contributions cannot be removed). Note
+   them and move on.
+4. Compare the `live bands` line with `level_commits` in `config.json`. If a band
+   now starts above the commit count we use for it, say so in the journal line
+   and your summary. **Do not edit `config.json`.** Those counts were frozen into
+   `plan/schedule.json`, and re-freezing mid-year is Felipe's call.
+5. Hand everything to the painter in **one** call:
+   `python3 commitzilla/scripts/dispatch.py --journal "<one line>" --repairs "<spec from step 3>"`
+   It waits until the workflow is idle, triggers it, and waits for it to finish.
+   The workflow makes the repairs with `paint.py`, appends your journal line, and
+   refreshes `actual.grid`, the renders and `achievements.md`, each through one
+   PR merged with `--merge`. Exit 0 means the run succeeded.
+   The journal line covers what the painter did (the last night's square), what
+   was repaired, and anything odd. Keep it to one line, with no secrets and no
+   personal data.
+6. Report: what you read, what you dispatched, and the run's URL and conclusion.
+
+Running on a machine with Felipe's real `gh` login (not a cloud session), the
+older local path also works: `verify.py --repair` paints repairs directly.
 
 ## Invariants — do not break these
 
@@ -82,5 +107,5 @@ drifts into the wrong band. Two consequences:
 - A square can always be repaired upward with backdated commits, which is the
   whole reason this survives a missed night.
 
-`verify.py` learns the live thresholds from the colours the GraphQL API returns
-rather than hardcoding them. Trust it over any number written in a doc.
+`verify.py` learns the live thresholds from the shades GitHub actually painted
+(`data-level` on the public calendar) rather than hardcoding them. Trust it over any number written in a doc.
