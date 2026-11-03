@@ -56,8 +56,9 @@ everything below:
    `python3 commitzilla/scripts/dispatch.py --journal "<one line>" --repairs "<spec from step 3>"`
    It waits until the workflow is idle, triggers it, and waits for it to finish.
    The workflow makes the repairs with `paint.py`, appends your journal line, and
-   refreshes `actual.grid`, the renders and `achievements.md`, each through one
-   PR merged with `--merge`. Exit 0 means the run succeeded.
+   refreshes `actual.grid` and the renders, each through one PR merged with
+   `--merge`. (`achievements.md` is left alone: the workflow's token can't see
+   private repos, so its count would come out too low.) Exit 0 means the run succeeded.
    The journal line covers what the painter did (the last night's square), what
    was repaired, and anything odd. Keep it to one line, with no secrets and no
    personal data.

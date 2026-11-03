@@ -7,7 +7,7 @@ on his graph -- the `overhead` trap. So it hands its notes to the workflow
 (see dispatch.py), and this script records them:
 
   - appends one journal line
-  - refreshes actual.grid, the renders and achievements.md
+  - refreshes actual.grid and the renders
   - commits all of it AS github-actions[bot] (not linked to Felipe, so it
     counts 0) and lands it through one branch, one PR, one --merge.
 
@@ -76,7 +76,8 @@ def main():
     run([sys.executable, os.path.join(HERE, "verify.py")], check=False)
     run([sys.executable, os.path.join(HERE, "render.py"), "--target"])
     run([sys.executable, os.path.join(HERE, "render.py"), "--actual"], check=False)
-    run([sys.executable, os.path.join(HERE, "achievements.py"), "--status"], check=False)
+    # Not achievements.py: the built-in token cannot see private repos, so it
+    # would overwrite achievements.md with a merged-PR count that is too low.
 
     if a.dry_run:
         run(["git", "--no-pager", "diff", "--stat"], check=False)
