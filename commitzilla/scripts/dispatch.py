@@ -1,23 +1,26 @@
-"""Hand the supervisor's work to the Actions painter. For cloud sessions.
+"""The cloud supervisor's one command: have Actions check the graph, then read the result.
 
-A Claude Code cloud session can call GitHub's REST API but not GraphQL, and
-anything it committed or merged itself would count on Felipe's graph. So it
-never writes to the repo. It triggers the workflow with workflow_dispatch
-(REST), and the workflow makes the repairs with paint.py and records the
-notes with record.py, as github-actions[bot], exactly as on a painted night.
+A Claude Code cloud session reaches GitHub only through the REST API: GraphQL
+is blocked, github.com pages (the contribution calendar) return 403, and
+anything it committed itself would count on Felipe's graph. So it does no
+checking and no writing of its own. It triggers the workflow in supervise mode
+(REST workflow_dispatch); Actions reads the calendar, repairs pale squares with
+paint.py and records the night with record.py, all as github-actions[bot]. Then
+this reads state/last_check.md back through the REST contents API and prints it.
 
-  dispatch.py --journal "..." [--repairs 2026-11-01:3,2026-11-02:2]
-              [--dry-run]
+  dispatch.py [--note "free text for the journal"] [--dry-run]
 
-Exit 0 only if the dispatched run finished successfully.
+Exit 0 only if the run succeeded. On failure it prints the run URL and the
+failing step, read from the REST jobs API.
 
 Why it waits for the workflow to be idle first: the workflow has a
-concurrency group, and GitHub keeps at most ONE pending run per group --
-a second one queued behind a running job cancels the first pending one. If
-that pending one were the nightly paint, tonight's square would be lost.
+concurrency group, and GitHub keeps at most ONE pending run per group. A
+second one queued behind a running job cancels the first pending one, and if
+that were the nightly paint, tonight's square would be lost.
 """
 
 import argparse
+import base64
 import json
 import os
 import subprocess
@@ -58,12 +61,22 @@ def wait_idle(limit_s):
         time.sleep(30)
 
 
+def failed_steps(run_id):
+    jobs = gh("-X", "GET", f"repos/{REPO}/actions/runs/{run_id}/jobs")["jobs"]
+    return [f"{j['name']} / {s['name']}: {s['conclusion']}"
+            for j in jobs for s in j.get("steps", []) if s["conclusion"] == "failure"]
+
+
+def report():
+    f = gh("-X", "GET", f"repos/{REPO}/contents/{CFG['project_dir']}/state/last_check.md?ref=main")
+    return base64.b64decode(f["content"]).decode("utf-8")
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--journal", required=True)
-    ap.add_argument("--repairs", default="")
+    ap.add_argument("--note", default="")
     ap.add_argument("--dry-run", action="store_true",
-                    help="dispatch with dry_run=true: the workflow prints and touches nothing")
+                    help="dispatch with dry_run=true: the workflow checks and prints, writes nothing")
     ap.add_argument("--idle-timeout", type=int, default=1200)
     ap.add_argument("--run-timeout", type=int, default=1500)
     a = ap.parse_args()
@@ -71,34 +84,39 @@ def main():
     if subprocess.run([sys.executable, os.path.join(HERE, "blackout.py")]).returncode:
         return 0  # the eye: no dispatch, nothing
 
-    for item in filter(None, a.repairs.split(",")):
-        d, _, n = item.partition(":")
-        datetime.strptime(d, "%Y-%m-%d")
-        if not n.isdigit() or not 1 <= int(n) <= 40:
-            raise SystemExit(f"bad repair {item!r}: want DATE:N with 1 <= N <= 40")
-
     wait_idle(a.idle_timeout)
     started = datetime.now(timezone.utc) - timedelta(seconds=5)
     gh("-X", "POST", f"repos/{REPO}/actions/workflows/{WF}/dispatches",
        "-f", "ref=main",
-       "-f", f"inputs[journal]={a.journal}",
-       "-f", f"inputs[repairs]={a.repairs}",
+       "-F", "inputs[supervise]=true",
+       "-f", f"inputs[note]={' '.join(a.note.split())}",
        "-F", f"inputs[dry_run]={'true' if a.dry_run else 'false'}")
-    print(f"dispatched {WF}: repairs=[{a.repairs}]", flush=True)
+    print("dispatched supervise run" + (" (dry run)" if a.dry_run else ""), flush=True)
 
-    run = None
-    end = time.time() + a.run_timeout
+    run_id, end = None, time.time() + a.run_timeout
     while time.time() < end:
         time.sleep(15)
         mine = [r for r in runs(event="workflow_dispatch")
                 if datetime.fromisoformat(r["created_at"].replace("Z", "+00:00")) >= started]
-        if mine:
-            run = mine[-1] if run is None else next((r for r in mine if r["id"] == run["id"]), run)
-            if run["status"] == "completed":
-                print(f"run {run['html_url']} finished: {run['conclusion']}")
-                return 0 if run["conclusion"] == "success" else 1
-    raise SystemExit(f"run did not finish within {a.run_timeout}s: "
-                     f"{run['html_url'] if run else 'never appeared'}")
+        if not mine:
+            continue
+        run = next((r for r in mine if r["id"] == run_id), mine[-1])
+        run_id = run["id"]
+        if run["status"] != "completed":
+            continue
+        print(f"run {run['html_url']} finished: {run['conclusion']}")
+        if run["conclusion"] != "success":
+            for s in failed_steps(run_id):
+                print(f"  failed: {s}")
+            return 1
+        if a.dry_run:
+            print("dry run: nothing recorded; see the run log for the check output")
+        else:
+            print("\n" + report())
+        return 0
+    raise SystemExit(f"run did not finish within {a.run_timeout}s"
+                     + (f": https://github.com/{REPO}/actions/runs/{run_id}" if run_id else
+                        " (never appeared)"))
 
 
 if __name__ == "__main__":

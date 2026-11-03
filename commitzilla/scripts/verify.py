@@ -51,6 +51,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--repair", action="store_true")
     ap.add_argument("--repair-spec", action="store_true")
+    ap.add_argument("--json", metavar="PATH", help="also write the findings as JSON (for record.py)")
     ap.add_argument("--days", type=int, default=400)
     ap.add_argument("--max-repairs", type=int, default=3,
                     help="cap repairs per run so a bad read cannot cause a commit storm")
@@ -115,6 +116,17 @@ def main():
     for day, entry, want, got, count in pale[-a.max_repairs:]:
         need = max(1, bands.get(want, CFG["level_commits"][str(want)]) - count)
         plan.append((day, need, want))
+
+    if a.json:
+        window = {d: {"want": e["level"], "got": days[d]["level"], "count": days[d]["count"]}
+                  for d, e in SCHED["days"].items()
+                  if d in days and horizon <= date.fromisoformat(d) <= today}
+        with open(a.json, "w") as fh:
+            json.dump({"source": source, "today": today.isoformat(), "bands": bands,
+                       "level_commits": CFG["level_commits"], "days": window,
+                       "pale": [d[0] for d in pale], "dark": [d[0] for d in dark],
+                       "repairs": [{"date": d, "extra": n, "level": w} for d, n, w in plan]},
+                      fh, indent=1, sort_keys=True)
 
     if a.repair_spec:
         print(",".join(f"{d}:{n}" for d, n, _ in plan))

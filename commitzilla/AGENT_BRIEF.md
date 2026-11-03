@@ -28,44 +28,39 @@ commit, so the two finish together.
 
 ## Your checklist
 
-You run in a Claude Code **cloud session**. Two facts about that sandbox shape
-everything below:
+You run in a Claude Code **cloud session**, and its sandbox reaches GitHub only
+through the REST API (`gh api repos/...`):
 
-- **GitHub GraphQL is blocked**, and `gh pr create` / `gh pr merge` use GraphQL,
-  so you cannot open or merge PRs yourself. `gh auth status` reporting an
-  invalid `GH_TOKEN` is normal there; REST calls (`gh api repos/...`) still work.
-- **You never commit, push, open a PR or open an issue.** Anything you did
-  through the session's GitHub access would be attributed to Felipe and land on
-  his graph (the `overhead` trap below). All writes go through the workflow via
-  `dispatch.py`, where they are made by `github-actions[bot]` and count 0.
+- **GraphQL is blocked**, which includes `gh pr create` / `gh pr merge`.
+  `gh auth status` reporting an invalid `GH_TOKEN` is normal there.
+- **github.com pages return 403**, including the contribution calendar, so
+  `verify.py` cannot run in the session. Don't try it.
+- **You never commit, push, open a PR or open an issue.** Anything done through
+  the session's GitHub access is attributed to Felipe and lands on his graph
+  (the `overhead` trap below).
+
+So the whole check runs inside the Actions workflow (supervise mode). It reads
+the calendar, repairs pale squares with `paint.py`, and records the night with
+`record.py`: a journal line, `state/last_check.md` and the renders, all
+committed by `github-actions[bot]`, which counts 0. Your part:
 
 1. `python3 commitzilla/scripts/blackout.py`. If it exits 1, stop. Do nothing
-   else at all today: no dispatch, no notification about the repo.
-2. `python3 commitzilla/scripts/verify.py --days 14`. It reads the public
-   calendar page, so it needs no token. If it fails, **stop and report.**
-3. `python3 commitzilla/scripts/verify.py --days 14 --repair-spec 2>/dev/null`
-   prints the pale squares to top up, as `DATE:N,DATE:N`, or nothing at all.
-   Tonight's square is excluded, since the painter may simply not have run yet.
-   **Too dark** squares cannot be fixed (contributions cannot be removed). Note
-   them and move on.
-4. Compare the `live bands` line with `level_commits` in `config.json`. If a band
-   now starts above the commit count we use for it, say so in the journal line
-   and your summary. **Do not edit `config.json`.** Those counts were frozen into
-   `plan/schedule.json`, and re-freezing mid-year is Felipe's call.
-5. Hand everything to the painter in **one** call:
-   `python3 commitzilla/scripts/dispatch.py --journal "<one line>" --repairs "<spec from step 3>"`
-   It waits until the workflow is idle, triggers it, and waits for it to finish.
-   The workflow makes the repairs with `paint.py`, appends your journal line, and
-   refreshes `actual.grid` and the renders, each through one PR merged with
-   `--merge`. (`achievements.md` is left alone: the workflow's token can't see
-   private repos, so its count would come out too low.) Exit 0 means the run succeeded.
-   The journal line covers what the painter did (the last night's square), what
-   was repaired, and anything odd. Keep it to one line, with no secrets and no
-   personal data.
-6. Report: what you read, what you dispatched, and the run's URL and conclusion.
+   else at all today.
+2. `python3 commitzilla/scripts/dispatch.py` (add `--note "..."` only if you
+   have something genuinely worth adding to the journal). It waits until the
+   workflow is idle, triggers it, waits for it to finish, and prints
+   `state/last_check.md`. Run it **once**.
+3. Report from that output: last night's square, any repairs, any dark squares,
+   any "bands to check", and the run URL. If it exited non-zero, report the
+   failing step it printed and stop. Don't retry more than once, and never
+   improvise commits.
 
-Running on a machine with Felipe's real `gh` login (not a cloud session), the
-older local path also works: `verify.py --repair` paints repairs directly.
+"Bands to check" means the lowest count seen at a level sits above the count we
+paint it with. **Do not edit `config.json`.** `level_commits` only feeds the
+run-once `plan/schedule.json` freeze, and re-freezing mid-year is Felipe's call.
+
+On a machine with Felipe's real `gh` login, the local path still works:
+`verify.py --days 14` reports, and `verify.py --repair` paints repairs directly.
 
 ## Invariants — do not break these
 

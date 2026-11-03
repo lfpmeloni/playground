@@ -7,11 +7,12 @@ name: commitzilla
 # past local midnight still paints the night it was meant for instead of
 # jumping a day and leaving a hole.
 #
-# The same workflow is the cloud supervisor's hands. The Claude Code routine
-# cannot commit for itself (GraphQL is blocked in its sessions, and anything it
-# pushed would count on the graph), so commitzilla/scripts/dispatch.py fires
-# this with `journal` set: repairs go through paint.py and the notes through
-# record.py, all attributed to github-actions[bot] and so worth 0 contributions.
+# The same workflow is the cloud supervisor's eyes and hands. The Claude Code
+# routine's sandbox can reach only the REST API: no GraphQL, no github.com
+# pages (so no calendar), and anything it pushed would count on the graph. So
+# commitzilla/scripts/dispatch.py fires this with `supervise: true`: the check
+# (verify.py), the repairs (paint.py) and the notes (record.py) all happen
+# here, attributed to github-actions[bot] and so worth 0 contributions.
 
 on:
   schedule:
@@ -29,11 +30,12 @@ on:
         description: "Print what would happen and touch nothing."
         type: boolean
         default: false
-      journal:
-        description: "Supervisor mode: journal line to record (skips tonight's paint)."
-        required: false
-      repairs:
-        description: "Supervisor mode: DATE:N,DATE:N backdated top-ups."
+      supervise:
+        description: "Supervisor mode: check the last 14 days, repair pale squares, record notes. Skips tonight's paint."
+        type: boolean
+        default: false
+      note:
+        description: "Supervisor mode: optional free text appended to the journal line."
         required: false
 
 concurrency:
@@ -69,7 +71,7 @@ jobs:
         run: python3 commitzilla/scripts/blackout.py
 
       - name: Paint tonight's square
-        if: ${{ !inputs.journal }}
+        if: ${{ !inputs.supervise }}
         env:
           GH_TOKEN: ${{ secrets.COMMITZILLA_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
@@ -79,7 +81,7 @@ jobs:
             ${{ inputs.dry_run && '--dry-run' || '' }}
 
       - name: Re-render progress
-        if: ${{ !inputs.dry_run && !inputs.journal }}
+        if: ${{ !inputs.dry_run && !inputs.supervise }}
         env:
           GH_TOKEN: ${{ secrets.COMMITZILLA_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
@@ -89,29 +91,41 @@ jobs:
           python3 commitzilla/scripts/render.py --actual || true
 
       # ---- supervisor mode (dispatched by the cloud routine) ----
-      # Inputs go through env, never ${{ }} inside run: the journal is free text.
+      # Inputs go through env, never ${{ }} inside run: the note is free text.
+
+      - name: Check the graph
+        id: check
+        if: ${{ inputs.supervise }}
+        run: |
+          # A failed read-back fails the run (bash -e): stop rather than guess.
+          # The report goes to stderr (the log); stdout is just DATE:N,DATE:N.
+          spec=$(python3 commitzilla/scripts/verify.py --days 14 --json "$RUNNER_TEMP/check.json" --repair-spec)
+          echo "repairs: [$spec]"
+          echo "spec=$spec" >> "$GITHUB_OUTPUT"
 
       - name: Repair pale squares
-        if: ${{ inputs.journal && inputs.repairs }}
+        if: ${{ inputs.supervise && steps.check.outputs.spec != '' }}
         env:
           GH_TOKEN: ${{ secrets.COMMITZILLA_TOKEN || secrets.GITHUB_TOKEN }}
-          REPAIRS: ${{ inputs.repairs }}
+          REPAIRS: ${{ steps.check.outputs.spec }}
           DRY: ${{ inputs.dry_run && '--dry-run' || '' }}
         run: |
           IFS=',' read -ra ITEMS <<< "$REPAIRS"
           for item in "${ITEMS[@]}"; do
             d="${item%%:*}"; n="${item##*:}"
-            [[ "$d" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ && "$n" =~ ^[0-9]+$ ]] || { echo "bad repair: $item"; exit 1; }
+            [[ "$d" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ && "$n" =~ ^[0-9]+$ && "$n" -le 40 ]] || { echo "bad repair: $item"; exit 1; }
             python3 commitzilla/scripts/paint.py --date "$d" --extra "$n" $DRY
           done
 
       - name: Record supervisor notes
-        if: ${{ inputs.journal }}
+        if: ${{ inputs.supervise }}
         env:
           # Built-in token ONLY: a PAT here would make the PR and merge Felipe's,
           # adding 2 contributions to whatever day this runs on.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JOURNAL: ${{ inputs.journal }}
+          NOTE: ${{ inputs.note }}
+          REPAIRED: ${{ steps.check.outputs.spec }}
           DRY: ${{ inputs.dry_run && '--dry-run' || '' }}
         run: |
-          python3 commitzilla/scripts/record.py --journal "$JOURNAL" $DRY
+          python3 commitzilla/scripts/record.py --check "$RUNNER_TEMP/check.json" \
+            --repaired "$REPAIRED" --note "$NOTE" $DRY
