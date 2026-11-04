@@ -17,6 +17,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from datetime import date, datetime, timedelta, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -39,6 +40,24 @@ def run(cmd, check=True, capture=False, env=None, cwd=REPO):
     if check and r.returncode:
         raise SystemExit(f"command failed: {' '.join(cmd)}")
     return ""
+
+
+def run_retry(cmd, attempts=5, delay=15, env=None):
+    """Network steps (push/fetch) hit transient GitHub 5xx errors now and then.
+
+    A single 'remote: Internal Server Error' used to fail the whole night.
+    Every command retried here is safe to repeat (push --force-with-lease to a
+    branch we own, fetch), so back off and try again before giving up.
+    """
+    for i in range(1, attempts + 1):
+        r = subprocess.run(cmd, cwd=REPO, env=env)
+        if r.returncode == 0:
+            return ""
+        if i < attempts:
+            wait = delay * i
+            print(f"attempt {i}/{attempts} failed: {' '.join(cmd)}; retrying in {wait}s", flush=True)
+            time.sleep(wait)
+    raise SystemExit(f"command failed after {attempts} attempts: {' '.join(cmd)}")
 
 
 def now_local():
@@ -136,7 +155,7 @@ def paint(day: str, extra: int, dry: bool, prog: dict, use_pr: bool = True, forc
     env = commit_env(day)
 
     if not dry:
-        run(["git", "fetch", "origin", "main"])
+        run_retry(["git", "fetch", "origin", "main"])
         run(["git", "checkout", "-B", branch, "origin/main"])
 
     for i in range(1, n + 1):
@@ -173,13 +192,13 @@ def paint(day: str, extra: int, dry: bool, prog: dict, use_pr: bool = True, forc
     run(["git", "commit", "--amend", "--no-edit"], env=env)
 
     if not use_pr:
-        run(["git", "push", "origin", f"{branch}:main"])
+        run_retry(["git", "push", "origin", f"{branch}:main"])
         run(["git", "checkout", "main"])
         run(["git", "branch", "-D", branch], check=False)
         print(f"{day}: pushed {n} commits straight to main")
         return prog
 
-    run(["git", "push", "-u", "origin", branch, "--force-with-lease"])
+    run_retry(["git", "push", "-u", "origin", branch, "--force-with-lease"])
     title = f"\U0001f996 commitzilla day {entry['day']}/364 — level {lvl}"
     body = (f"Painting `{day}` at level {lvl} ({n} commits).\n\n"
             f"Square: column {entry['col']}, row {entry['row']} of the 52x7 grid.\n"
@@ -191,7 +210,7 @@ def paint(day: str, extra: int, dry: bool, prog: dict, use_pr: bool = True, forc
     # commit and the square comes out a shade too pale.
     run(["gh", "pr", "merge", branch, "--merge", "--delete-branch"])
     run(["git", "checkout", "main"])
-    run(["git", "fetch", "origin", "main"])
+    run_retry(["git", "fetch", "origin", "main"])
     run(["git", "reset", "--hard", "origin/main"])
     print(f"{day}: merged {n} commits via PR, branch deleted")
     return prog
