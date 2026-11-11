@@ -3,10 +3,10 @@
 > A dragon is being uncovered here one commit at a time, in step with the one
 > being painted onto the contribution graph. Both finish on 2027-10-16.
 
-<!-- commitzilla-reveal: 90/3276 -->
+<!-- commitzilla-reveal: 91/3276 -->
 
 ```
-█···················································    2.7%
+█···················································    2.8%
 ```
 
 ```
@@ -16,7 +16,7 @@
 ░░░░░
 ░░░░░
 ░░░░░
-░░░░
+░░░░░
 ░░░░
 ░░░░
 ░░░░
