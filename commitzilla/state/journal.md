@@ -10,3 +10,4 @@ One line per night from the supervisor.
 - **2026-11-08** · painter 2026-11-07: L1/L1 (2) ok · no repairs · dark (14d, unfixable): 2026-11-02 · bands to check: L3 seen only from 13, we paint 12; L4 seen only from 21, we paint 18
 - **2026-11-09** · painter 2026-11-08: L1/L1 (2) ok · no repairs · dark (14d, unfixable): 2026-11-02 · bands to check: L3 seen only from 13, we paint 12; L4 seen only from 21, we paint 18
 - **2026-11-10** · painter 2026-11-09: L1/L1 (2) ok · no repairs · dark (14d, unfixable): 2026-11-02 · bands to check: L3 seen only from 13, we paint 12; L4 seen only from 21, we paint 18
+- **2026-11-11** · painter 2026-11-10: L1/L1 (2) ok · no repairs · dark (14d, unfixable): 2026-11-02 · bands to check: L3 seen only from 13, we paint 12; L4 seen only from 21, we paint 18
