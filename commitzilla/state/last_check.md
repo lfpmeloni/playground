@@ -1,18 +1,17 @@
 # Last supervisor check
 
-_Written by `scripts/record.py` in Actions at 2026-11-12 13:23 UTC.
-Read-back via `html`; graph ends 2026-11-12._
+_Written by `scripts/record.py` in Actions at 2026-11-13 14:56 UTC.
+Read-back via `html`; graph ends 2026-11-13._
 
-**Summary:** painter 2026-11-11: L2/L3 (12) PALE · repaired 2026-11-11:1 · pale (14d): 2026-11-11 · dark (14d, unfixable): 2026-11-02 · bands to check: L3 seen only from 13, we paint 12; L4 seen only from 21, we paint 18
+**Summary:** painter 2026-11-12: L2/L3 (12) PALE · repaired 2026-11-12:1 · pale (14d): 2026-11-12 · dark (14d, unfixable): 2026-11-02 · bands to check: L3 seen only from 13, we paint 12; L4 seen only from 21, we paint 18
 
 - Live bands (count at which each level starts): `{'0': 0, '1': 1, '2': 7, '3': 13, '4': 21}`
 - `level_commits` in use: `{'1': 2, '2': 7, '3': 12, '4': 18}`
 - Bands to check (lowest count seen per level vs what we paint): L3 seen only from 13, we paint 12; L4 seen only from 21, we paint 18
-- Repairs: 2026-11-11:1
+- Repairs: 2026-11-12:1
 
 | Day | Want | Got | Contributions | |
 |---|---|---|---|---|
-| 2026-10-29 | L2 | L2 | 7 | ok |
 | 2026-10-30 | L1 | L1 | 2 | ok |
 | 2026-10-31 | L1 | L1 | 2 | ok |
 | 2026-11-01 | L1 | L1 | 2 | ok |
@@ -25,5 +24,6 @@ Read-back via `html`; graph ends 2026-11-12._
 | 2026-11-08 | L1 | L1 | 2 | ok |
 | 2026-11-09 | L1 | L1 | 2 | ok |
 | 2026-11-10 | L1 | L1 | 2 | ok |
-| 2026-11-11 | L3 | L2 | 12 | PALE |
+| 2026-11-11 | L3 | L3 | 13 | ok |
 | 2026-11-12 | L3 | L2 | 12 | PALE |
+| 2026-11-13 | L1 | L1 | 5 | ok |
